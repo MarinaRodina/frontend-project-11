@@ -1,7 +1,6 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "type": "module",
   "description": "A programme that collects and aggregates news feeds from various websites into one place",
   "main": "src/index.js",
   "scripts": {
