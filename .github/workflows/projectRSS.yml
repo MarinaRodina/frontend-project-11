@@ -1,0 +1,22 @@
+name: Node CI
+
+on: 
+   - push
+   - pull_request
+   
+env:
+  CI: true   
+   
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set Node.js 19.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '19.x' 
+          cache: 'npm' 
+      - run: make install
+      - run: make lint
