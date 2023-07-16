@@ -15,7 +15,7 @@ const app = () => {
 
   const state = {
     form: {
-      valid: true,
+      valid: null,
       processState: 'filling',
       errors: [],
     },
@@ -25,12 +25,12 @@ const app = () => {
 
   //написать функция реднера во view.js
   const watchedState = onChange(state, (path, current, previous) => {
-    render(......);
+    render();
   })
 
   // добавление слушателя на форму
-    form.addEventListener('submit', (e) => {
-    watchedState.form.processState = 'processing';
+    elements.form.addEventListener('submit', (e) => {
+    watchedState.elements.form.processState = 'processing';
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = formData.get('url');
@@ -38,15 +38,18 @@ const app = () => {
     validate(url, urls)
       .then((validatedUrl) => {
         watchedState.form.valid = true;
-        input.reset();
-        input.focus();
+        elements.form.reset();
+        elements.input.focus();
         return validatedUrl;
       })
       .catch((error) => {
         watchedState.form.valid = false;
-        watchedState.form.processState = 'error';
+        watchedState.form.processState = 'failed';
+        watchedState.form.errors.push(error);
+
       });
   });
 };
 
  export default app();
+ 
