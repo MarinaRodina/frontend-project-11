@@ -7,12 +7,13 @@ import resources from './locales/index.js';
 
 const elements = {
   form: document.querySelector('.rss-form'),
-  submit: document.querySelector('button[type="submit"]'),
-  input: document.querySelector('#url-input'),
   feedback: document.querySelector('.feedback'),
-  feeds: document.querySelector('.feeds'),
+  input: document.querySelector('#url-input'),
+  submit: document.querySelector('button[type="submit"]'),
   posts: document.querySelector('.posts'),
+  feeds: document.querySelector('.feeds'),
 };
+
 const defaultLanguage = 'ru';
 
 const init = async () => {
@@ -106,37 +107,58 @@ const distributeRss = (data, state) => {
   state.loadingProcess.state = 'success';
 };
 
+const updateRss = (state, time) => {
+  setTimeout(() => {
+    const { urls } = state;
+    const newRss = urls.map(getRss);
+    const oldPosts = state.posts;
+    Promise.all(newRss).then((item) => {
+      const newPosts = item.map(({ rss }) => addPosts(rss));
+      const uniquePosts = newPosts
+        .flat()
+        .filter((newPost) => !oldPosts.some((oldPost) => oldPost.id === newPost.id));
+      if (uniquePosts.length > 0) {
+      // eslint-disable-next-line no-param-reassign
+        state.posts = [...uniquePosts, ...state.posts];
+      }
+    });
+    updateRss(state, time);
+  }, time);
+};
+
 const app = (i18nextInstance) => {
-  const initState = buildInitialState();
-  const watchedState = watch(elements, i18nextInstance, initState);
+  const initialState = buildInitialState();
+  const watchedState = watch(elements, i18nextInstance, initialState);
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = formData.get('url');
-    validate(url, watchedState.urls).then((error) => {
-      if (error) {
-        watchedState.form.valid = false;
-        watchedState.form.message = error;
-        return;
-      }
-      watchedState.form.valid = true;
-      watchedState.loadingProcess.state = 'loading';
-      getRss(url)
-        .then((data) => distributeRss(data, watchedState))
-        .catch((err) => {
-          const { message } = err;
+    validate(url, watchedState.urls)
+      .then((error) => {
+        if (error) {
           watchedState.form.valid = false;
-          watchedState.loadingProcess.state = 'failed';
-          if (message === 'parseError' || message === 'networkError') {
-            watchedState.form.message = i18nextInstance.t(`errors.${message}`);
-          } else {
-            watchedState.form.message = message;
-          }
-        })
-        .finally(() => {
-          watchedState.loadingProcess.state = 'waiting';
-        });
-    });
+          watchedState.form.message = error;
+          return;
+        }
+        watchedState.form.valid = true;
+        watchedState.loadingProcess.state = 'loading';
+        getRss(url)
+          .then((data) => distributeRss(data, watchedState))
+          .catch((err) => {
+            const { message } = err;
+            watchedState.form.valid = false;
+            watchedState.loadingProcess.state = 'failed';
+            if (message === 'parseError' || message === 'networkError') {
+              watchedState.form.message = i18nextInstance.t(`errors.${message}`);
+            } else {
+              watchedState.form.message = message;
+            }
+          })
+          .finally(() => {
+            watchedState.loadingProcess.state = 'waiting';
+          });
+      });
+    updateRss(watchedState, 5000);
   });
 };
 
