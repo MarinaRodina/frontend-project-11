@@ -62,13 +62,12 @@ export default (elements, i18n, initialState) => {
       itemLink.dataset.id = id;
       itemLink.href = link;
       itemLink.textContent = title;
-      button.outerHTML = `
-      <button type="button" 
-      data-id="${id}" 
-      class="btn btn-outline-primary btn-sm" 
-      data-bs-toggle="modal" 
-      data-bs-target="#modal">${i18n.t('view')}</button>
-      `;
+      if (state.uiState.viewedLinks.includes(id)) {
+        itemLink.classList.remove('fw-bold');
+        itemLink.classList.add('fw-normal', 'link-secondary');
+      }
+      button.outerHTML = `<button type="button" data-id="${id}" class="btn btn-outline-primary btn-sm" 
+      data-bs-toggle="modal" data-bs-target="#modal">${i18n.t('view')}</button>`;
     });
   };
 
@@ -127,6 +126,17 @@ export default (elements, i18n, initialState) => {
     }
   };
 
+  const renderModal = (state) => {
+    const modalTitle = elements.modal.querySelector('.modal-title');
+    const modalBody = elements.modal.querySelector('.modal-body');
+    const modalLink = elements.modal.querySelector('.full-article');
+    const id = state.uiState.modalBox;
+    const { title, link, description } = state.posts.find((post) => post.id === id);
+    modalTitle.textContent = title;
+    modalBody.textContent = description;
+    modalLink.href = link;
+  };
+
   const state = onChange(initialState, (path) => {
     switch (path) {
       case 'loadingProcess.state':
@@ -143,6 +153,9 @@ export default (elements, i18n, initialState) => {
         break;
       case 'posts':
         renderContainer(state, 'posts');
+        break;
+      case 'uiState.modalBox':
+        renderModal(state);
         break;
       default:
         break;

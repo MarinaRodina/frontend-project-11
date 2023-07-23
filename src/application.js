@@ -12,6 +12,7 @@ const elements = {
   submit: document.querySelector('button[type="submit"]'),
   posts: document.querySelector('.posts'),
   feeds: document.querySelector('.feeds'),
+  modal: document.querySelector('#modal'),
 };
 
 const defaultLanguage = 'ru';
@@ -58,6 +59,10 @@ const buildInitialState = () => {
     posts: [],
     feeds: [],
     urls: [],
+    uiState: {
+      modalBox: '',
+      viewedLinks: [],
+    },
   };
   return state;
 };
@@ -159,8 +164,17 @@ const app = (i18nextInstance) => {
             watchedState.loadingProcess.state = 'waiting';
           });
       });
-    updateRss(watchedState, 5000);
   });
+  elements.posts.addEventListener('click', (event) => {
+    if (event.target.tagName === 'A') {
+      watchedState.uiState.viewedLinks.push(event.target.dataset.id);
+    }
+    if (event.target.tagName === 'BUTTON') {
+      watchedState.uiState.modalBox = event.target.dataset.id;
+      watchedState.uiState.viewedLinks.push(event.target.dataset.id);
+    }
+  });
+  updateRss(watchedState, 5000);
 };
 
 export default () => {
