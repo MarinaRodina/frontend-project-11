@@ -4,4 +4,19 @@
 
 **RSS aggregator**
 =
-link to go -> <https://frontend-project-11-eight-blue.vercel.app>
+
+Welcome to RSS aggregator!
+
+RSS is a specialised format designed to describe news feeds, article announcements and other content. 
+This application is able to poll RSS feeds of sites for new posts and shows them in a convenient way, marking what you have read.
+
+Try it:
+-
+Link to go -> <https://frontend-project-11-eight-blue.vercel.app>
+
+Installation and Usage:
+-
+
+* git clone git@github.com:MarinaRodina/frontend-project-11.git
+* make install
+* make build
