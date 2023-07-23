@@ -37,7 +37,8 @@ const init = async () => {
 };
 
 const validate = (url, urls) => {
-  const schema = yup.string().url().notOneOf(urls).required();
+  const schema = yup.string().url().trim().notOneOf(urls)
+    .required();
   return schema
     .validate(url)
     .then(() => null)
