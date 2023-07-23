@@ -151,6 +151,9 @@ export default (elements, i18n, initialState) => {
       case 'feeds':
         renderContainer(state, 'feeds');
         break;
+      case 'uiState.viewedLinks':
+        renderContainer(state, 'posts');
+        break;
       case 'posts':
         renderContainer(state, 'posts');
         break;
