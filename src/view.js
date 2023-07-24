@@ -56,16 +56,17 @@ export default (elements, i18n, initialState) => {
       const itemLink = document.createElement('a');
       const button = document.createElement('button');
       item.append(itemLink, button);
-      itemLink.classList.add('fw-bold');
+      if (state.uiState.viewedLinks.includes(id)) {
+        itemLink.classList.add('fw-normal', 'link-secondary');
+      }
+      if (!state.uiState.viewedLinks.includes(id)) {
+        itemLink.classList.add('fw-bold');
+      }
       itemLink.setAttribute('target', '_blank');
       itemLink.setAttribute('rel', 'noopener noreferrer');
       itemLink.dataset.id = id;
       itemLink.href = link;
       itemLink.textContent = title;
-      if (state.uiState.viewedLinks.includes(id)) {
-        itemLink.classList.remove('fw-bold');
-        itemLink.classList.add('fw-normal', 'link-secondary');
-      }
       button.outerHTML = `<button type="button" data-id="${id}" class="btn btn-outline-primary btn-sm" 
       data-bs-toggle="modal" data-bs-target="#modal">${i18n.t('view')}</button>`;
     });

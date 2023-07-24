@@ -5,16 +5,6 @@ import parseRss from './parsefeed.js';
 import watch from './view.js';
 import resources from './locales/index.js';
 
-const elements = {
-  form: document.querySelector('.rss-form'),
-  feedback: document.querySelector('.feedback'),
-  input: document.querySelector('#url-input'),
-  submit: document.querySelector('button[type="submit"]'),
-  posts: document.querySelector('.posts'),
-  feeds: document.querySelector('.feeds'),
-  modal: document.querySelector('#modal'),
-};
-
 const defaultLanguage = 'ru';
 
 const init = async () => {
@@ -133,19 +123,24 @@ const updateRss = (state, time) => {
 };
 
 const app = (i18nextInstance) => {
+  const elements = {
+    form: document.querySelector('.rss-form'),
+    feedback: document.querySelector('.feedback'),
+    input: document.querySelector('#url-input'),
+    submit: document.querySelector('button[type="submit"]'),
+    posts: document.querySelector('.posts'),
+    feeds: document.querySelector('.feeds'),
+    modal: document.querySelector('#modal'),
+  };
   const initialState = buildInitialState();
   const watchedState = watch(elements, i18nextInstance, initialState);
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = formData.get('url');
+    watchedState.loadingProcess.state = 'waiting';
     validate(url, watchedState.urls)
-      .then((error) => {
-        if (error) {
-          watchedState.form.valid = false;
-          watchedState.form.message = error;
-          return;
-        }
+      .then(() => {
         watchedState.form.valid = true;
         watchedState.loadingProcess.state = 'loading';
         getRss(url)
@@ -163,8 +158,14 @@ const app = (i18nextInstance) => {
           .finally(() => {
             watchedState.loadingProcess.state = 'waiting';
           });
+      })
+      .catch((error) => {
+        watchedState.form.valid = false;
+        watchedState.form.message = error;
+        return;
       });
   });
+
   elements.posts.addEventListener('click', (event) => {
     if (event.target.tagName === 'A') {
       watchedState.uiState.viewedLinks.push(event.target.dataset.id);
