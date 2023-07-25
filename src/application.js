@@ -32,8 +32,7 @@ const validate = (url, urls) => {
     .required();
   return schema
     .validate(url)
-    .then(() => null)
-    .catch((error) => error.message);
+    .then(() => null);
 };
 
 const buildInitialState = () => {
@@ -145,24 +144,19 @@ const app = (i18nextInstance) => {
         watchedState.loadingProcess.state = 'loading';
         getRss(url)
           .then((data) => distributeRss(data, watchedState))
-          .catch((err) => {
-            const { message } = err;
-            watchedState.form.valid = false;
-            watchedState.loadingProcess.state = 'failed';
-            if (message === 'parseError' || message === 'networkError') {
-              watchedState.form.message = i18nextInstance.t(`errors.${message}`);
-            } else {
-              watchedState.form.message = message;
-            }
-          })
           .finally(() => {
             watchedState.loadingProcess.state = 'waiting';
           });
       })
-      .catch((error) => {
+      .catch((err) => {
+        const { message } = err;
         watchedState.form.valid = false;
-        watchedState.form.message = error;
-        return;
+        watchedState.loadingProcess.state = 'failed';
+        if (message === 'parseError' || message === 'networkError') {
+          watchedState.form.message = i18nextInstance.t(`errors.${message}`);
+        } else {
+          watchedState.form.message = i18nextInstance.t('errors.invalidUrl');
+        }
       });
   });
 
