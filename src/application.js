@@ -154,7 +154,7 @@ const app = (i18nextInstance) => {
         if (message === 'parseError' || message === 'networkError') {
           watchedState.form.message = i18nextInstance.t(`errors.${message}`);
         } else {
-          watchedState.form.message = i18nextInstance.t('errors.invalidUrl');
+          watchedState.form.message = message;
         }
       });
   });
