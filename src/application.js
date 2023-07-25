@@ -142,11 +142,11 @@ const app = (i18nextInstance) => {
       .then(() => {
         watchedState.form.valid = true;
         watchedState.loadingProcess.state = 'loading';
-        getRss(url)
-          .then((data) => distributeRss(data, watchedState))
-          .finally(() => {
-            watchedState.loadingProcess.state = 'waiting';
-          });
+        return getRss(url);
+      })
+      .then((data) => distributeRss(data, watchedState))
+      .finally(() => {
+        watchedState.loadingProcess.state = 'waiting';
       })
       .catch((err) => {
         const { message } = err;
