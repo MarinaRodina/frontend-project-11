@@ -137,11 +137,10 @@ const app = (i18nextInstance) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = formData.get('url');
-    watchedState.loadingProcess.state = 'waiting';
+    watchedState.loadingProcess.state = 'loading';
     validate(url, watchedState.urls)
       .then(() => {
         watchedState.form.valid = true;
-        watchedState.loadingProcess.state = 'loading';
         return getRss(url);
       })
       .then((data) => distributeRss(data, watchedState))
