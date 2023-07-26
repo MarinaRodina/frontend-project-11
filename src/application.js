@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
-import parseRss from './parsefeed.js';
+import parseFeed from './parsefeed.js';
 import watch from './view.js';
 import resources from './locales/index.js';
 
@@ -63,38 +63,15 @@ const getRss = (url) => {
   return axios
     .get(proxyUrl)
     .then((response) => response.data)
-    .then((data) => ({ url, rss: parseRss(data.contents) }))
+    .then((data) => ({ url, rss: parseFeed(data.contents) }))
     .catch((err) => {
       throw err.message === 'Network Error' ? new Error('networkError') : err;
     });
 };
 
-const addPosts = (rss) => {
-  const items = rss.querySelectorAll('item');
-  const posts = [];
-  items.forEach((item) => {
-    const title = item.querySelector('title').textContent;
-    const description = item.querySelector('description').textContent;
-    const link = item.querySelector('link').textContent;
-    const id = item.querySelector('guid').textContent;
-    posts.push({
-      title, description, link, id,
-    });
-  });
-  return posts;
-};
-
-const addFeeds = (rss) => {
-  const feed = rss.querySelector('channel');
-  const title = feed.querySelector('title').textContent;
-  const description = feed.querySelector('description').textContent;
-  return { title, description };
-};
-
 const distributeRss = (data, state) => {
   const { url, rss } = data;
-  const feed = addFeeds(rss);
-  const posts = addPosts(rss);
+  const { feed, posts } = rss;
   state.urls.push(url);
   state.feeds.push(feed);
   state.posts.push(...posts);
@@ -104,19 +81,23 @@ const distributeRss = (data, state) => {
 
 const updateRss = (state, time) => {
   setTimeout(() => {
+    const oldPosts = state.posts;
     const { urls } = state;
     const newRss = urls.map(getRss);
-    const oldPosts = state.posts;
-    Promise.all(newRss).then((item) => {
-      const newPosts = item.map(({ rss }) => addPosts(rss));
-      const uniquePosts = newPosts
-        .flat()
-        .filter((newPost) => !oldPosts.some((oldPost) => oldPost.id === newPost.id));
-      if (uniquePosts.length > 0) {
-      // eslint-disable-next-line no-param-reassign
-        state.posts = [...uniquePosts, ...state.posts];
-      }
-    });
+    Promise.all(newRss)
+      .then((item) => {
+        const newPosts = item.map(({ response }) => {
+          const { posts } = parseFeed(response.data.contents);
+          return posts;
+        });
+        const uniquePosts = newPosts
+          .flat()
+          .filter((newPost) => !oldPosts.some((oldPost) => oldPost.id === newPost.id));
+        if (uniquePosts.length > 0) {
+          state.posts.push(uniquePosts);
+        }
+      })
+      .catch(() => null);
     updateRss(state, time);
   }, time);
 };
