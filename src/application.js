@@ -95,8 +95,8 @@ const updateRss = (state, time) => {
           state.posts.push(uniquePosts);
         }
       })
+      .finally(() => updateRss(state, time))
       .catch(() => null);
-    updateRss(state, time);
   }, time);
 };
 
