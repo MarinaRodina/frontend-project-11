@@ -6,6 +6,7 @@ import watch from './view.js';
 import resources from './locales/index.js';
 
 const defaultLanguage = 'ru';
+const delay = 5000;
 
 const init = async () => {
   const i18nextInstance = i18next.createInstance();
@@ -30,9 +31,7 @@ const init = async () => {
 const validate = (url, urls) => {
   const schema = yup.string().url().trim().notOneOf(urls)
     .required();
-  return schema
-    .validate(url)
-    .then(() => null);
+  return schema.validate(url);
 };
 
 const buildInitialState = () => {
@@ -75,7 +74,6 @@ const distributeRss = (data, state) => {
   state.urls.push(url);
   state.feeds.push(feed);
   state.posts.push(...posts);
-  // eslint-disable-next-line no-param-reassign
   state.loadingProcess.state = 'success';
 };
 
@@ -149,7 +147,7 @@ const app = (i18nextInstance) => {
       watchedState.uiState.viewedLinks.push(event.target.dataset.id);
     }
   });
-  updateRss(watchedState, 5000);
+  updateRss(watchedState, delay);
 };
 
 export default () => {
