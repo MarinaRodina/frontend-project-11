@@ -56,12 +56,7 @@ export default (elements, i18n, initialState) => {
       const itemLink = document.createElement('a');
       const button = document.createElement('button');
       item.append(itemLink, button);
-      if (state.uiState.viewedLinks.includes(id)) {
-        itemLink.classList.add('fw-normal', 'link-secondary');
-      }
-      if (!state.uiState.viewedLinks.includes(id)) {
-        itemLink.classList.add('fw-bold');
-      }
+      itemLink.classList.add(state.uiState.viewedLinks.includes(id) ? ('fw-normal', 'link-secondary') : ('fw-bold'));
       itemLink.setAttribute('target', '_blank');
       itemLink.setAttribute('rel', 'noopener noreferrer');
       itemLink.dataset.id = id;
