@@ -73,6 +73,7 @@ const distributeRss = (data, state) => {
   const { feed, posts } = rss;
   state.urls.push(url);
   state.feeds.push(feed);
+
   state.posts.push(...posts);
   state.loadingProcess.state = 'success';
 };
