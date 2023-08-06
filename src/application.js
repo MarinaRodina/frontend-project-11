@@ -84,15 +84,15 @@ const updateRss = (state, time) => {
     const newRss = urls.map(getRss);
     Promise.all(newRss)
       .then((item) => {
-        const newPosts = item.map(({ response }) => {
-          const { posts } = parseFeed(response.data.contents);
+        const newPosts = item.map(({ rss }) => {
+          const { posts } = rss;
           return posts;
         });
         const uniquePosts = newPosts
           .flat()
           .filter((newPost) => !oldPosts.some((oldPost) => oldPost.id === newPost.id));
         if (uniquePosts.length > 0) {
-          state.posts.push(uniquePosts);
+          state.posts.push(...uniquePosts);
         }
       })
       .finally(() => updateRss(state, time))
