@@ -1,4 +1,5 @@
 import * as yup from 'yup';
+import _ from 'lodash';
 import i18next from 'i18next';
 import axios from 'axios';
 import parseFeed from './parsefeed.js';
@@ -63,6 +64,15 @@ const getRss = (url) => {
     .get(proxyUrl)
     .then((response) => response.data)
     .then((data) => ({ url, rss: parseFeed(data.contents) }))
+    .then((content) => {
+      const { rss } = content;
+      const { posts } = rss;
+      posts.forEach((post) => {
+        const id = _.uniqueId();
+        post.id = id;
+      });
+      return content;
+    })
     .catch((err) => {
       throw err.message === 'Network Error' ? new Error('networkError') : err;
     });
