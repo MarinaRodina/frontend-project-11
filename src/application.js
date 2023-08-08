@@ -86,13 +86,13 @@ const updateRss = (state, time) => {
     Promise.all(newRss)
       .then((item) => {
         const newPosts = item.map(({ rss }) => {
+          console.log(item);
           const { posts } = rss;
           return posts;
         });
         const uniquePosts = newPosts
           .flat()
-          .filter((newPost) => !oldPosts.some((oldPost) => oldPost.id === newPost.id));
-          console.log(uniquePosts);
+          .filter((newPost) => !oldPosts.some((oldPost) => oldPost.title === newPost.title));
         if (uniquePosts.length > 0) {
           state.posts.push(...uniquePosts);
         }
