@@ -92,6 +92,7 @@ const updateRss = (state, time) => {
         const uniquePosts = newPosts
           .flat()
           .filter((newPost) => !oldPosts.some((oldPost) => oldPost.id === newPost.id));
+          console.log(uniquePosts);
         if (uniquePosts.length > 0) {
           state.posts.push(...uniquePosts);
         }
